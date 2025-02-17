@@ -1,0 +1,46 @@
+In the course of our design, we made use of 4 different design patterns: Command,
+Memento, Observer, and Strategy.
+
+We used the Command pattern for storing move information. In particular, the 
+worker to be moved, the direction to be moved in, and the direction to build in.
+Additionally, if the user chose to turn on score display, we also store that.
+This made our design cleaner and more efficient: instead of individually
+and redundantly modifying the board for each of the three possible turns (human,
+random, and heuristic), we could simply get the move in each turn, create a Command
+object with it, and execute it all at once in the main loop of our program in SantoriniCLI.
+Furthermore, considering how we need to print the move (and scores if applicable),
+we integrate a print function into our Command class to easily do that as well
+while we have the associated move that was just made in the game.
+
+We used the Memento pattern for the undo/redo functionality. We defined two
+classes for it: the Memento and the Caretaker. The Memento simply stores the instance variables
+of the board at a particular point in time (which we did at the beginning of every
+turn). The Caretaker manages our mementos into two lists: past and future states,
+necessitated by having to both undo and redo. We additionally have an "offset"
+variable, which represents the current state of the board. This structure allowed
+us to easily implement the undo/redo functionality of the assignment; whenever
+we undo or redo, we can go through the past or future states respectively in our
+Caretaker by popping and pushing to and from our states. This allows us to
+store every turn and go through each at will. Whenever we decide to make a next
+turn, we delete all future states and push the offset to save what the current state
+of the game was to our past states. This structure for our Memento and Caretaker
+made it straightforward and intuitive to store and restore states.
+
+The Observer strategy was used for determining when the game was over. This was
+particularly useful because of the fact that multiple conditions can end the
+game: for instance, if a player's worker gets on a level 3 space or if a player
+can't make any more moves. We split this into two classes: the actual Observer
+and the ConditionChecker. The ConditionChecker checks if one of the win conditions
+is met and if so, it pushes it to the Observer, and since the Observer controls the main game
+loop, it can identify when to end the game. We also modified the ConditionChecker to
+store the winner as well, which we pushed to the observer to print to the user.
+This structure made it easy to control the main game loop. 
+
+The Strategy pattern was used for determining which set of calculations to run for
+each type of player. We recognized that there were three distinct procedures 
+depending on whether the player making the turn was human, heuristic, or random.
+In main (SantoriniCLI), we can call the same function every time and decide which
+of these three procedures to use at runtime based on the types of player 1 and
+player 2. This means that although the three procedures are remarkably different,
+we can use the same interface every time to access them. We store them in three
+different subclasses. This allows us scalability and consistency in our code.
